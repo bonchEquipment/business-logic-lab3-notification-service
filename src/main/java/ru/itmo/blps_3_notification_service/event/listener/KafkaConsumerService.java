@@ -23,7 +23,9 @@ public class KafkaConsumerService {
     @KafkaListener(topics = "send-email", groupId = "notification-service-group")
     public void listen(String message) throws JsonProcessingException {
         log.info("got message from topic send-email message is {}", message);
-        var dto = ObjectParser.readValue(message, SendEmailDto.class);
+        String jsonString = message.substring(1, message.length() - 1).replace("\\\"", "\"").replace("\\\\n", "\\n");
+        var dto = ObjectParser.readValue(jsonString, SendEmailDto.class);
+
         try {
             log.info("converted to dto {}", dto);
             mailService.sendEmailToUser(dto);
